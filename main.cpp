@@ -1,5 +1,5 @@
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include <stdlib.h>
 
@@ -37,13 +37,52 @@ std::vector<float> UUniFast(int n, int u){
 	return utilizations;
 }
 
+std::vector<int> GeneratePeriods(int n, int ub){
+	int seed = (int)time(0);			// random seed
+
+	CRandomMersenne RanGen(seed);		// make instance of random number generator
+
+	std::vector<int> periods(n);
+	periods[n-1] = ub;
+
+	int numIntervals = ceil(log(ub));
+	int periodsPerInterval = floor((n-1)/numIntervals);
+	int remaining = (n-1)%numIntervals;
+
+	for(int i=0; i<numIntervals-1; i++){
+		for(int j=0; j<periodsPerInterval; j++){
+			periods[i*periodsPerInterval+j] = RanGen.IRandom(exp(i), exp(i+1));
+		}
+	}
+
+	for(int j=0; j<periodsPerInterval; j++){
+		periods[(numIntervals-1)*periodsPerInterval+j] = RanGen.IRandom(exp(numIntervals-1), ub);
+	}
+
+	for(int i=0; i<remaining; i++){
+		periods[numIntervals*periodsPerInterval+i] = RanGen.IRandom(exp(i), exp(i+1));
+	}
+
+	EndOfProgram();
+
+	return periods;
+}
+
 int main(){
 
-	std::vector<float> utilizations = UUniFast(9, 1);
+	int n = 14;
+
+	std::vector<float> utilizations = UUniFast(n, 1);
 	for(int i=0; i<utilizations.size(); i++){
 		std::cout << utilizations[i] << std::endl;
 	}
 
+	printf("\n");
+
+	std::vector<int> periods = GeneratePeriods(n, 10000);
+	for(int i=0; i<periods.size(); i++){
+		std::cout << periods[i] << std::endl;
+	}
 
 	return 0;
 }
