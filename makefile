@@ -5,7 +5,7 @@ GXX := g++
 GXXFLAGS :=
 
 # target executable
-TARGET := MAIN
+TARGET := MAIN.out
 
 # header files
 INCLUDES := -I src/include
