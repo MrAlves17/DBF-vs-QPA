@@ -37,6 +37,8 @@ float upper_bound_L_b(std::vector< std::vector<float>>& taskset){
 	float w_prev = w_0;
 	float w_actual = 0;
 	while(w_prev != w_actual){
+		w_prev = w_actual;
+		w_actual = 0;
 		for(int i=0; i<taskset.size(); i++){
 			w_actual += taskset[i][0]*taskset[i][1]*ceil(w_prev/taskset[i][1]);
 		}
