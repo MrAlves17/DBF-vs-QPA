@@ -17,12 +17,12 @@
 
 std::vector<float> UUniFast(int n, int u){
 
-	int seed = (int)time(0);			// random seed
+	int seed = (int)time(0);
 
-	CRandomMersenne RanGen(seed);		// make instance of random number generator
+	CRandomMersenne RanGen(seed);
 
-	float nextSumU;
 	std::vector<float> utilizations(n);
+	float nextSumU;
 	float sumU = u;
 	for(int i=0; i<n-1;i++){
 		nextSumU = sumU*std::pow(RanGen.Random(),1.0/(n-i));
@@ -37,15 +37,15 @@ std::vector<float> UUniFast(int n, int u){
 	return utilizations;
 }
 
-std::vector<int> GeneratePeriods(int n, int ub){
-	int seed = (int)time(0);			// random seed
+std::vector<int> GeneratePeriods(int n, int TmaxPerTmin){
+	int seed = (int)time(0);
 
-	CRandomMersenne RanGen(seed);		// make instance of random number generator
+	CRandomMersenne RanGen(seed);
 
 	std::vector<int> periods(n);
-	periods[n-1] = ub;
+	periods[n-1] = TmaxPerTmin;
 
-	int numIntervals = ceil(log(ub));
+	int numIntervals = ceil(log(TmaxPerTmin));
 	int periodsPerInterval = floor((n-1)/numIntervals);
 	int remaining = (n-1)%numIntervals;
 
@@ -56,7 +56,7 @@ std::vector<int> GeneratePeriods(int n, int ub){
 	}
 
 	for(int j=0; j<periodsPerInterval; j++){
-		periods[(numIntervals-1)*periodsPerInterval+j] = RanGen.IRandom(exp(numIntervals-1), ub);
+		periods[(numIntervals-1)*periodsPerInterval+j] = RanGen.IRandom(exp(numIntervals-1), TmaxPerTmin);
 	}
 
 	for(int i=0; i<remaining; i++){
@@ -68,21 +68,63 @@ std::vector<int> GeneratePeriods(int n, int ub){
 	return periods;
 }
 
+std::vector<int> GenerateRelativeDeadlines(int n, std::vector<float>& utilizations, std::vector<int>& periods){
+	int seed = (int)time(0);
+
+	CRandomMersenne RanGen(seed);
+
+	std::vector<int> relativeDeadlines(n);
+
+	for(int i=0; i<n; i++){
+		float a, b = 1.2*periods[i];
+		float computationTime = utilizations[i]*periods[i];
+
+		if(computationTime < 10){
+			a = computationTime;
+		}else if(computationTime < 100){
+			a = 2*computationTime;
+		}else if(computationTime < 1000){
+			a = 3*computationTime;
+		}else{
+			a = 4*computationTime;
+		}
+
+		relativeDeadlines[i] = RanGen.IRandom(ceil(a),ceil(b));
+	}
+
+	EndOfProgram();
+
+	return relativeDeadlines;
+}
+
+std::vector< std::vector<float>> IntegrateTasksData(int n, std::vector<float>& utilizations, std::vector<int>& periods, std::vector<int>& relativeDeadlines){
+	std::vector< std::vector<float>> taskset;
+	taskset.resize(n);
+
+	for(int i=0; i<n; i++){
+		taskset[i].push_back(utilizations[i]);
+		taskset[i].push_back(periods[i]);
+		taskset[i].push_back(relativeDeadlines[i]);
+	}
+
+	return taskset;
+}
+
 int main(){
 
 	int n = 14;
+	int TmaxPerTmin = 1000;
 
 	std::vector<float> utilizations = UUniFast(n, 1);
-	for(int i=0; i<utilizations.size(); i++){
-		std::cout << utilizations[i] << std::endl;
+	std::vector<int> periods = GeneratePeriods(n, TmaxPerTmin);
+	std::vector<int> relativeDeadlines = GenerateRelativeDeadlines(n, utilizations, periods);
+
+	std::vector< std::vector<float>> taskset = IntegrateTasksData(n, utilizations, periods, relativeDeadlines);
+	for(int i=0; i<taskset.size(); i++){
+		for(int j=0; j<taskset[i].size(); j++){
+			printf("%.3f ", taskset[i][j]);
+		}
+		printf("\n");
 	}
-
-	printf("\n");
-
-	std::vector<int> periods = GeneratePeriods(n, 10000);
-	for(int i=0; i<periods.size(); i++){
-		std::cout << periods[i] << std::endl;
-	}
-
 	return 0;
 }

@@ -45,7 +45,7 @@ void EndOfProgram() {
 
   // It may be necessary to end the program with a linefeed:
   #if defined (__unix__) || defined (_MSC_VER)
-  printf("\n");                        // end program with a linefeed
+  // printf("\n");                        // end program with a linefeed
   #endif
 }
 
