@@ -6,10 +6,46 @@
 #include "dbf_algorithm.hpp"
 #include <getopt.h>
 
+#include <cmath>
+
 void show_help(const char *name);
 void read_args(const int argc, char* argv[], PARAMETERS& param);
 
 float sum_utilizations(std::vector<float>& utilizations);
+
+float upper_bound_L_a(std::vector< std::vector<float>>& taskset, float total_utilization){
+	float L_a = 0;
+	for(int i=0; i<taskset.size(); i++){
+		L_a = std::max(L_a, taskset[i][2]);
+	}
+
+	float value = 0;
+	for(int i=0; i<taskset.size(); i++){
+		value += ((taskset[i][1]-taskset[i][2])*taskset[i][0])/(1-total_utilization);
+	}
+
+	L_a = std::max(L_a, value);
+	return L_a;
+}
+
+float upper_bound_L_b(std::vector< std::vector<float>>& taskset){
+	float w_0 = 0;
+	for(int i=0; i<taskset.size(); i++){
+		w_0 += taskset[i][0]*taskset[i][1];
+	}
+
+	float w_prev = w_0;
+	float w_actual = 0;
+	while(w_prev != w_actual){
+		for(int i=0; i<taskset.size(); i++){
+			w_actual += taskset[i][0]*taskset[i][1]*ceil(w_prev/taskset[i][1]);
+		}
+	}
+
+	float L_b = w_actual;
+
+	return L_b;
+}
 
 int main(int argc, char* argv[]){
 
