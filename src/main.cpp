@@ -1,53 +1,15 @@
-#include <iostream>
 #include <vector>
-#include <stdlib.h>
+#include <cstdlib>
 #include "parameters.hpp"
 #include "generate_task_set.hpp"
 #include "dbf_algorithm.hpp"
+#include "qpa_algorithm.hpp"
 #include <getopt.h>
-
-#include <cmath>
 
 void show_help(const char *name);
 void read_args(const int argc, char* argv[], PARAMETERS& param);
 
 float sum_utilizations(std::vector<float>& utilizations);
-
-float upper_bound_L_a(std::vector< std::vector<float>>& taskset, float total_utilization){
-	float L_a = 0;
-	for(int i=0; i<taskset.size(); i++){
-		L_a = std::max(L_a, taskset[i][2]);
-	}
-
-	float value = 0;
-	for(int i=0; i<taskset.size(); i++){
-		value += ((taskset[i][1]-taskset[i][2])*taskset[i][0])/(1-total_utilization);
-	}
-
-	L_a = std::max(L_a, value);
-	return L_a;
-}
-
-float upper_bound_L_b(std::vector< std::vector<float>>& taskset){
-	float w_0 = 0;
-	for(int i=0; i<taskset.size(); i++){
-		w_0 += taskset[i][0]*taskset[i][1];
-	}
-
-	float w_prev = w_0;
-	float w_actual = 0;
-	while(w_prev != w_actual){
-		w_prev = w_actual;
-		w_actual = 0;
-		for(int i=0; i<taskset.size(); i++){
-			w_actual += taskset[i][0]*taskset[i][1]*ceil(w_prev/taskset[i][1]);
-		}
-	}
-
-	float L_b = w_actual;
-
-	return L_b;
-}
 
 int main(int argc, char* argv[]){
 
@@ -63,15 +25,23 @@ int main(int argc, char* argv[]){
 	std::vector< std::vector<float>> taskset = IntegrateTasksData(param.ntasks, utilizations, periods, relativeDeadlines);
 
 	for(int i=0; i<taskset.size(); i++){
-		printf("%.2f\t%.2f\t%.2f\n", taskset[i][0], taskset[i][1], taskset[i][2]);
+		printf("%.2f\t\t%.2f\t\t%.2f\n", taskset[i][0], taskset[i][1], taskset[i][2]);
 	}
 
 	float total_utilization = sum_utilizations(utilizations);
 	printf("%f\n", total_utilization);
+
+	printf("Trying DBF* analysis\n");
 	if(restrictionsDBFValidated(taskset, param.total_utilization)){
-		printf("DBF* proved task set is schedule \n");
+		printf("DBF* proved task set is schedulable \n");
 	}else{
-		printf("Didn't prove\n");
+		printf("DBF* didn't prove\n");
+		printf("\nTrying QPA analysis\n");
+		if(validated_by_qpa(taskset, param.total_utilization)){
+			printf("QPA proved task set is schedulable \n");
+		}else{
+			printf("QPA didn't prove\n");
+		}
 	}
 
 	return 0;

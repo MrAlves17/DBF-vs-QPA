@@ -1,6 +1,4 @@
 #include "dbf_algorithm.hpp"
-#include <vector>
-
 
 float dbf_sum(std::vector< std::vector<float>>& taskset, float deadlineTask){
 	float sum = 0;
