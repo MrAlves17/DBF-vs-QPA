@@ -3,17 +3,18 @@
 
 class PARAMETERS{
 	public: 
-	int ntasks, TmaxPerTmin;
+	int ntasks, TmaxPerTmin, seed;
 	float total_utilization;
-	bool dbf, qpa, both;
+	bool generate_tasksets;
+	bool run_tests;
 
 	PARAMETERS(){
+		seed = 0;
 		ntasks = 14;
 		TmaxPerTmin = 100;
 		total_utilization = 0.70;
-		dbf = false;
-		qpa = false; 
-		both = false;
+		generate_tasksets = false; 
+		run_tests = false;
 	}
 };
 

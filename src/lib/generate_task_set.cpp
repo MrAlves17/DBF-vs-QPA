@@ -15,11 +15,13 @@
 #include <iostream>
 #include <cmath>
 
-std::vector<float> UUniFast(int n, float u){
+CRandomMersenne RanGen(0);
 
-	int seed = (int)time(0);
+void init_seed(int seed){
+	RanGen.RandomInit(seed);
+}
 
-	CRandomMersenne RanGen(seed);
+std::vector<float> UUniFast(int seed, int n, float u){
 
 	std::vector<float> utilizations(n);
 	float nextSumU;
@@ -37,10 +39,7 @@ std::vector<float> UUniFast(int n, float u){
 	return utilizations;
 }
 
-std::vector<int> GeneratePeriods(int n, int TmaxPerTmin){
-	int seed = (int)time(0);
-
-	CRandomMersenne RanGen(seed);
+std::vector<int> GeneratePeriods(int seed, int n, int TmaxPerTmin){
 
 	std::vector<int> periods(n);
 	periods[n-1] = TmaxPerTmin;
@@ -68,10 +67,7 @@ std::vector<int> GeneratePeriods(int n, int TmaxPerTmin){
 	return periods;
 }
 
-std::vector<int> GenerateRelativeDeadlines(int n, std::vector<float>& utilizations, std::vector<int>& periods){
-	int seed = (int)time(0);
-
-	CRandomMersenne RanGen(seed);
+std::vector<int> GenerateRelativeDeadlines(int seed, int n, std::vector<float>& utilizations, std::vector<int>& periods){
 
 	std::vector<int> relativeDeadlines(n);
 
@@ -87,6 +83,11 @@ std::vector<int> GenerateRelativeDeadlines(int n, std::vector<float>& utilizatio
 			a = 3*computationTime;
 		}else{
 			a = 4*computationTime;
+		}
+
+		int k=3;
+		while(a > b){
+			a = (k--)*computationTime;
 		}
 
 		relativeDeadlines[i] = RanGen.IRandom(ceil(a),ceil(b));
