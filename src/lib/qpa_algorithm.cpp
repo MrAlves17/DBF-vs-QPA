@@ -63,11 +63,13 @@ bool qpa(std::vector< std::vector<float>>& taskset, float L, float d_min){
 	bool validated_by_qpa;
 
 	float h_t = h_function(taskset, t);
+	int qpa_points=1;
 	while(h_t <= t && h_t > d_min){
 		if(h_t < t) t = h_t;
 		else t = maximum_deadline(taskset, t);
 
 		h_t = h_function(taskset, t);
+		qpa_points++;
 	}
 
 	if(h_t <= d_min){
@@ -78,6 +80,8 @@ bool qpa(std::vector< std::vector<float>>& taskset, float L, float d_min){
 		// printf("Task set is not schedulable\n");
 		validated_by_qpa = false;
 	}
+
+	// printf("QPA points: %d\n", qpa_points);
 
 	return validated_by_qpa;
 }
@@ -110,9 +114,9 @@ std::vector<float> absolute_deadlines(std::vector< std::vector<float>>& taskset,
 bool validated_by_qpa(std::vector< std::vector<float>>& taskset, float total_utilization){
 	
 	float L_a = upper_bound_L_a(taskset, total_utilization);
-	// printf("deadlines (< L_a): %ld\n", absolute_deadlines(taskset, L_a).size());
+	// printf("deadlines (< L_a = %f): %ld\n", L_a, absolute_deadlines(taskset, L_a).size());
 	float L_b = upper_bound_L_b(taskset);
-	// printf("deadlines (< L_b): %ld\n", absolute_deadlines(taskset, L_b).size());
+	// printf("deadlines (< L_b = %f): %ld\n", L_b, absolute_deadlines(taskset, L_b).size());
 
 	float L = std::min(L_a, L_b);
 	float d_min = minimum_deadline(taskset);

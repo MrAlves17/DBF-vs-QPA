@@ -13,7 +13,7 @@
 void show_help(const char *name);
 void read_args(const int argc, char* argv[], PARAMETERS& param);
 
-float sum_utilizations(std::vector<float>& utilizations);
+float sum_utilizations(std::vector< std::vector<float>>& tasksets);
 
 void output_task_set(std::vector< std::vector<float>>& taskset, int taskset_id){
 	std::fstream file;
@@ -79,7 +79,7 @@ void run_tests(PARAMETERS& param){
 		}else{
 			// printf("DBF* didn't prove\n");
 			// printf("\nTrying QPA analysis\n");
-			if(validated_by_qpa(taskset, param.total_utilization)){
+			if(validated_by_qpa(taskset, sum_utilizations(taskset))){
 				// printf("QPA proved task set is schedulable \n");
 				qpa_schedulable++;
 			}else{
@@ -110,10 +110,10 @@ int main(int argc, char* argv[]){
 	return 0;
 }
 
-float sum_utilizations(std::vector<float>& utilizations){
+float sum_utilizations(std::vector< std::vector<float>>& tasksets){
 	float sum = 0;
-	for(int i=0; i<utilizations.size(); i++){
-		sum += utilizations[i];
+	for(int i=0; i<tasksets.size(); i++){
+		sum += tasksets[i][0];
 	}
 
 	return sum;
