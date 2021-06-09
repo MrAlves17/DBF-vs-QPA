@@ -1,6 +1,6 @@
-#include "dbf_algorithm.hpp"
+#include "dbf_star_algorithm.hpp"
 
-float dbf_sum(std::vector< std::vector<float>>& taskset, float deadlineTask, int id_task){
+float dbf_star_sum(std::vector< std::vector<float>>& taskset, float deadlineTask, int id_task){
 	float sum = 0;
 	for(int i=0; i<taskset.size(); i++){
 		if(i!=id_task && deadlineTask >= taskset[i][2]){
@@ -11,9 +11,9 @@ float dbf_sum(std::vector< std::vector<float>>& taskset, float deadlineTask, int
 	return sum;
 }
 
-bool restrictionsDBFValidated(std::vector< std::vector<float>>& taskset, float total_utilization){
+bool restrictions_dbf_star_validated(std::vector< std::vector<float>>& taskset, float total_utilization){
 	for(int i=0; i<taskset.size(); i++){
-		if(taskset[i][2] - dbf_sum(taskset, taskset[i][2], i) < taskset[i][0]*taskset[i][1]){
+		if(taskset[i][2] - dbf_star_sum(taskset, taskset[i][2], i) < taskset[i][0]*taskset[i][1]){
 			return false;
 		}
 		if(1 - (total_utilization - taskset[i][0]) < taskset[i][0]){

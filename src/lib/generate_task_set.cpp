@@ -1,4 +1,6 @@
 #include "generate_task_set.hpp"
+#include "io_functions.hpp"
+
 #include <time.h>							// define time()
 #include "../../randomc/randomc.h"			// define classes for random number generators
 
@@ -10,7 +12,6 @@
    // define system specific user interface:
    #include "../../randomc/userintf.cpp"
 #endif
-#include "parameters.hpp"
 
 #include <iostream>
 #include <cmath>
@@ -109,4 +110,17 @@ std::vector< std::vector<float>> IntegrateTasksData(int n, std::vector<float>& u
 	}
 
 	return taskset;
+}
+
+void generate_task_sets(PARAMETERS& param){
+	for(int taskset_id = 1; taskset_id<=param.numTasksets; taskset_id++){
+		std::vector<float> utilizations = UUniFast(param.seed, param.ntasks, param.total_utilization);
+		std::vector<int> periods = GeneratePeriods(param.seed, param.ntasks, param.TmaxPerTmin);
+		std::vector<int> relativeDeadlines = GenerateRelativeDeadlines(param.seed, param.ntasks, utilizations, periods);
+
+		// [utilization, period, relative deadline]
+		std::vector< std::vector<float>> taskset = IntegrateTasksData(param.ntasks, utilizations, periods, relativeDeadlines);
+
+		output_task_set(taskset, taskset_id);
+	}
 }
