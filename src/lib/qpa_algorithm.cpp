@@ -58,7 +58,7 @@ float maximum_deadline(std::vector< std::vector<float>>& taskset, float t){
 	return d_t_max;
 }
 
-bool qpa(std::vector< std::vector<float>>& taskset, float L, float d_min){
+bool qpa(std::vector< std::vector<float>>& taskset, float L, float d_min, STATISTICAL_DATA& st_data){
 	float t = maximum_deadline(taskset, L);
 	bool validated_by_qpa;
 
@@ -81,7 +81,8 @@ bool qpa(std::vector< std::vector<float>>& taskset, float L, float d_min){
 		validated_by_qpa = false;
 	}
 
-	// printf("QPA points: %d\n", qpa_points);
+	st_data.sum_qpa_points += qpa_points;
+	st_data.sum_dbf_points += absolute_deadlines(taskset, L).size();
 
 	return validated_by_qpa;
 }
@@ -111,15 +112,23 @@ std::vector<float> absolute_deadlines(std::vector< std::vector<float>>& taskset,
 	return absolute_deadlines;
 }
 
-bool validated_by_qpa(std::vector< std::vector<float>>& taskset, float total_utilization){
+bool validated_by_qpa(std::vector< std::vector<float>>& taskset, float total_utilization, STATISTICAL_DATA& st_data){
+	if(total_utilization > 1){
+		return false;
+	}
 	
-	float L_a = upper_bound_L_a(taskset, total_utilization);
-	// printf("deadlines (< L_a = %f): %ld\n", L_a, absolute_deadlines(taskset, L_a).size());
+	float L_a;
 	float L_b = upper_bound_L_b(taskset);
 	// printf("deadlines (< L_b = %f): %ld\n", L_b, absolute_deadlines(taskset, L_b).size());
+	if(total_utilization != 1){
+		L_a = upper_bound_L_a(taskset, total_utilization);
+		// printf("deadlines (< L_a = %f): %ld\n", L_a, absolute_deadlines(taskset, L_a).size());
+	}else{
+		L_a = L_b;
+	}
 
 	float L = std::min(L_a, L_b);
 	float d_min = minimum_deadline(taskset);
 
-	return qpa(taskset, L, d_min);
+	return qpa(taskset, L, d_min, st_data);
 }

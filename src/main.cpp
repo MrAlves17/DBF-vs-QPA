@@ -1,11 +1,13 @@
 #include <vector>
 #include <cstdlib>
 #include "parameters.hpp"
+#include "statistical_data.hpp"
+#include "tests.hpp"
+#include "qpa_algorithm.hpp"
 #include "generate_task_set.hpp"
 #include "dbf_star_algorithm.hpp"
-#include "qpa_algorithm.hpp"
+#include "dbf_algorithm.hpp"
 #include "io_functions.hpp"
-#include "tests.hpp"
 #include <getopt.h>
 
 void show_help(const char *name);
@@ -39,9 +41,14 @@ usage: %s <parameters>\n\
 	-u,		--utilization <value>		set utilization.\n\
 	-k,		--numTasksets <value>		set number of tasksets.\n\
 	-g,		--gen_tasksets				generate tasksets.\n\
-	-r,		--run_tests					run tests.\n", name);
+	-c,		--schedulable				generate schedulable sets.\n\
+	-r,		--run_tests					run tests.\n\
+	-d,		--dbf_test					dbf test (old method).\n\
+	-q,		--qpa_test					qpa test.\n\
+	-b,		--dbf_star_qpa_test			dbf* + qpa test.\n", name);
 	exit(-1);
 }
+
 
 void read_args(const int argc, char* argv[], PARAMETERS& param) {
 	int opt;
@@ -50,22 +57,26 @@ void read_args(const int argc, char* argv[], PARAMETERS& param) {
 		https://linux.die.net/man/3/getopt_long
 	*/
 	const option options[] = {
-		{"help"			, no_argument       , 0 , 'h' },
-		{"seed"			, required_argument , 0 , 's' },
-		{"ntasks"		, required_argument , 0 , 'n' },
-		{"TmaxPerTmin"	, required_argument , 0 , 't' },
-		{"utilization"	, required_argument , 0 , 'u' },
-		{"numTasksets"	, required_argument , 0 , 'k' },
-		{"gen_tasksets"	, no_argument       , 0 , 'g' },
-		{"run_tests"	, no_argument       , 0 , 'r' },
-		{0              , 0                 , 0 ,  0  },
+		{"help"						, no_argument       , 0 , 'h' },
+		{"seed"						, required_argument , 0 , 's' },
+		{"ntasks"					, required_argument , 0 , 'n' },
+		{"TmaxPerTmin"				, required_argument , 0 , 't' },
+		{"utilization"				, required_argument , 0 , 'u' },
+		{"numTasksets"				, required_argument , 0 , 'k' },
+		{"gen_tasksets"				, no_argument       , 0 , 'g' },
+		{"schedulable"				, no_argument       , 0 , 'c' },
+		{"run_tests"				, no_argument       , 0 , 'r' },
+		{"dbf_test"					, no_argument       , 0 , 'd' },
+		{"qpa_test"					, no_argument       , 0 , 'q' },
+		{"dbf_star_qpa_test"		, no_argument       , 0 , 'b' },
+		{0              			, 0                 , 0 ,  0  },
 	};
 
 	if (argc < 2) {
 		show_help(argv[0]);
 	}
 
-	while( (opt = getopt_long(argc, argv, "hs:n:t:u:k:gr", options, NULL)) > 0 ) {
+	while( (opt = getopt_long(argc, argv, "hs:n:t:u:k:gcrdbq", options, NULL)) > 0 ) {
 		switch ( opt ) {
 			case 'h': /* -h ou --help */
 				show_help(argv[0]);
@@ -88,8 +99,20 @@ void read_args(const int argc, char* argv[], PARAMETERS& param) {
 			case 'g': /* -g ou --gen_tasksets* */
 				param.generate_tasksets = true;
 				break;
+			case 'c': /* -c ou --schedulable* */
+				param.schedulable = true;
+				break;
 			case 'r': /* -r ou --run_tests */
 				param.run_tests = true;
+				break;
+			case 'd': /* -d ou --dbf_test */
+				param.dbf_test = true;
+				break;
+			case 'q': /* -q ou --qpa_test */
+				param.qpa_test = true;
+				break;
+			case 'b': /* -b ou --both_test */
+				param.dbf_star_qpa_test = true;
 				break;
 			default:
 				fprintf(stderr, "Opcao invalida ou faltando argumento: `%c'\n", optopt);

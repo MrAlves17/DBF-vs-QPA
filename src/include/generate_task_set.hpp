@@ -3,6 +3,8 @@
 
 #include <vector>
 #include "parameters.hpp"
+#include "qpa_algorithm.hpp"
+#include "tests.hpp"
 
 void init_seed(int seed);
 std::vector<float> UUniFast(int seed, int n, float u);

@@ -11,7 +11,7 @@ TARGET := MAIN.out
 INCLUDES := -I src/include
 
 # source files
-SOURCES := src/lib/generate_task_set.cpp src/lib/dbf_star_algorithm.cpp src/lib/qpa_algorithm.cpp src/lib/io_functions.cpp src/lib/tests.cpp
+SOURCES := src/lib/generate_task_set.cpp src/lib/dbf_star_algorithm.cpp src/lib/qpa_algorithm.cpp src/lib/dbf_algorithm.cpp src/lib/io_functions.cpp src/lib/tests.cpp
 
 # object files
 # src/lib/ -> build/
@@ -35,6 +35,10 @@ build/dbf_star_algorithm.o: src/lib/dbf_star_algorithm.cpp
 build/qpa_algorithm.o: src/lib/qpa_algorithm.cpp
 	mkdir -p $(dir $@)
 	$(GXX) $(GXXFLAGS) $(INCLUDES) -c src/lib/qpa_algorithm.cpp -o $@
+
+build/dbf_algorithm.o: src/lib/dbf_algorithm.cpp
+	mkdir -p $(dir $@)
+	$(GXX) $(GXXFLAGS) $(INCLUDES) -c src/lib/dbf_algorithm.cpp -o $@
 
 build/io_functions.o: src/lib/io_functions.cpp
 	mkdir -p $(dir $@)
