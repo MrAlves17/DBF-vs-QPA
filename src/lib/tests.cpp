@@ -22,10 +22,10 @@ void dbf_test(PARAMETERS& param){
 
 		float total_utilization = sum_utilizations(taskset);
 		if(validated_by_dbf(taskset, total_utilization)){
-			// printf("QPA proved task set is schedulable \n");
+			// printf("DBF proved task set is schedulable \n");
 			dbf_schedulable++;
 		}else{
-			// printf("QPA didn't prove\n");
+			// printf("DBF didn't prove\n");
 			dbf_unschedulable++;
 		}
 	}
@@ -37,13 +37,14 @@ void dbf_test(PARAMETERS& param){
 void qpa_test(PARAMETERS& param){
 	int qpa_schedulable = 0;
 	int qpa_unschedulable = 0;
-	STATISTICAL_DATA st_data = STATISTICAL_DATA();
+	DBF_QPA_TEST_DATA DQ_tdata;
 	for(int taskset_id=1; taskset_id<=param.numTasksets; taskset_id++){
 		std::vector< std::vector<float>> taskset = read_taskset(taskset_id, param.ntasks);
 		// printf("TASKSET %d\n", taskset_id);
 
 		float total_utilization = sum_utilizations(taskset);
-		if(validated_by_qpa(taskset, total_utilization, st_data)){
+		DQ_tdata = validated_by_qpa(taskset, total_utilization);
+		if(DQ_tdata.feasible){
 			// printf("QPA proved task set is schedulable \n");
 			qpa_schedulable++;
 		}else{
@@ -52,7 +53,7 @@ void qpa_test(PARAMETERS& param){
 		}
 	}
 
-	printf("%lf;%lf\n", (double)st_data.sum_dbf_points/param.numTasksets, (double)st_data.sum_qpa_points/param.numTasksets);
+	printf("%lf;%lf\n", (double)DQ_tdata.sum_dbf_points/param.numTasksets, (double)DQ_tdata.sum_qpa_points/param.numTasksets);
 
 	// printf("%.2f%%;%.2f%%\n", 100.0*qpa_schedulable/param.numTasksets, 100.0*qpa_unschedulable/param.numTasksets);
 }
@@ -62,7 +63,8 @@ void dbf_star_qpa_test(PARAMETERS& param){
 	int qpa_schedulable = 0;
 	int qpa_unschedulable = 0;
 
-	STATISTICAL_DATA st_data = STATISTICAL_DATA();
+	DBF_QPA_TEST_DATA DQ_tdata = DBF_QPA_TEST_DATA();
+
 	for(int taskset_id=1; taskset_id<=param.numTasksets; taskset_id++){
 		std::vector< std::vector<float>> taskset = read_taskset(taskset_id, param.ntasks);
 		// printf("TASKSET %d\n", taskset_id);
@@ -75,7 +77,8 @@ void dbf_star_qpa_test(PARAMETERS& param){
 		}else{
 			// printf("DBF* didn't prove\n");
 			// printf("\nTrying QPA analysis\n");
-			if(validated_by_qpa(taskset, total_utilization, st_data)){
+			DQ_tdata = validated_by_qpa(taskset, total_utilization);
+			if(DQ_tdata.feasible){
 				// printf("QPA proved task set is schedulable \n");
 				qpa_schedulable++;
 			}else{

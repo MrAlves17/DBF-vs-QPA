@@ -2,4 +2,4 @@
 build/*
 tasksets/*
 !tasksets/.gitempty
-*.txt
+testes.txt

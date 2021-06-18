@@ -58,7 +58,7 @@ float maximum_deadline(std::vector< std::vector<float>>& taskset, float t){
 	return d_t_max;
 }
 
-bool qpa(std::vector< std::vector<float>>& taskset, float L, float d_min, STATISTICAL_DATA& st_data){
+DBF_QPA_TEST_DATA qpa(std::vector< std::vector<float>>& taskset, float L, float d_min){
 	float t = maximum_deadline(taskset, L);
 	bool validated_by_qpa;
 
@@ -81,10 +81,12 @@ bool qpa(std::vector< std::vector<float>>& taskset, float L, float d_min, STATIS
 		validated_by_qpa = false;
 	}
 
-	st_data.sum_qpa_points += qpa_points;
-	st_data.sum_dbf_points += absolute_deadlines(taskset, L).size();
+	DBF_QPA_TEST_DATA DQ_tdata = DBF_QPA_TEST_DATA();
+	DQ_tdata.feasible = validated_by_qpa;
+	DQ_tdata.sum_qpa_points += qpa_points;
+	DQ_tdata.sum_dbf_points += absolute_deadlines(taskset, L).size();
 
-	return validated_by_qpa;
+	return DQ_tdata;
 }
 
 float minimum_deadline(std::vector< std::vector<float>>& taskset){
@@ -112,9 +114,10 @@ std::vector<float> absolute_deadlines(std::vector< std::vector<float>>& taskset,
 	return absolute_deadlines;
 }
 
-bool validated_by_qpa(std::vector< std::vector<float>>& taskset, float total_utilization, STATISTICAL_DATA& st_data){
+DBF_QPA_TEST_DATA validated_by_qpa(std::vector< std::vector<float>>& taskset, float total_utilization){
 	if(total_utilization > 1){
-		return false;
+		DBF_QPA_TEST_DATA DQ_tdata = DBF_QPA_TEST_DATA();
+		return DQ_tdata;
 	}
 	
 	float L_a;
@@ -130,5 +133,5 @@ bool validated_by_qpa(std::vector< std::vector<float>>& taskset, float total_uti
 	float L = std::min(L_a, L_b);
 	float d_min = minimum_deadline(taskset);
 
-	return qpa(taskset, L, d_min, st_data);
+	return qpa(taskset, L, d_min);
 }

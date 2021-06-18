@@ -118,10 +118,10 @@ void generate_task_sets(PARAMETERS& param){
 		std::vector<int> periods = GeneratePeriods(param.seed, param.ntasks, param.TmaxPerTmin);
 		std::vector<int> relativeDeadlines = GenerateRelativeDeadlines(param.seed, param.ntasks, utilizations, periods);
 
-		STATISTICAL_DATA st_data = STATISTICAL_DATA();
+		DBF_QPA_TEST_DATA DQ_tdata = DBF_QPA_TEST_DATA();
 		// [utilization, period, relative deadline]
 		std::vector< std::vector<float>> taskset = IntegrateTasksData(param.ntasks, utilizations, periods, relativeDeadlines);
-		if(param.dbf_star_qpa_test || validated_by_qpa(taskset, sum_utilizations(taskset), st_data) == param.schedulable){
+		if(param.dbf_star_qpa_test || validated_by_qpa(taskset, sum_utilizations(taskset)).feasible == param.schedulable){
 			output_task_set(taskset, taskset_id);
 		}else{
 			taskset_id--;

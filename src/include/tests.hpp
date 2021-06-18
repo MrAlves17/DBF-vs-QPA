@@ -6,7 +6,7 @@
 #include "dbf_algorithm.hpp"
 #include "qpa_algorithm.hpp"
 #include "io_functions.hpp"
-#include "statistical_data.hpp"
+#include "dbf_qpa_test_data.hpp"
 #include <vector>
 #include <cstdio>
 
