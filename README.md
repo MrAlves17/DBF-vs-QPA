@@ -1,17 +1,25 @@
 # DBF-vs-QPA
 
-To run tests, execute these comands:
+This project was done for Real Time Systems Course at UFBA in 2021.1
 
-make
+It consists of an analysis of schedulability test algorithms based in the article of Zhang and Burns (2009). 
 
-./MAIN -n [ntasks] -u [utilization] -t [TmaxPerTmin] -s [seed] -k [numTasksets] -g -r
+For this purpose, two tests were done:
 
-g: generate_tasksets (optional)
+	1. A comparison between the old method of detecting schedulability (called here as DBF) and the QPA (Quick convergence Processor-demand Analysis). 
+	The test measures the number of h(t) calculations for both approaches. The function h(t) stands for Processor Demand Function, that means the
+	same thing of DBF (Demand Bound Function).
 
-r: run_tests (optional)
+	2. Analysis of how many times the DBF* (a sufficient method for detecting processor schedulability) proved the task set schedulable and run QPA for
+	the	failed cases to check if the task set was schedulable or not.
 
-EXAMPLE:
+A report of the results are available at the PDF (Portuguese).
 
-make
+## How to Execute
 
-./MAIN.out -n 14 -u 0.7 -t 10000 -s 1 -k 6000 -r -g
+To run tests, execute this comand in the Terminal:
+
+./run_tests.sh
+
+The tests' results are available at: results/
+
